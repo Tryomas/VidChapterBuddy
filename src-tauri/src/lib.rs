@@ -136,12 +136,16 @@ fn inspect_videos(paths: Vec<String>) -> Result<Vec<VideoMetadata>,String> {
 async fn open_repository() -> Result<(),String> {
  tauri::async_runtime::spawn_blocking(||open::that("https://github.com/Tryomas/VidChapterBuddy").map_err(|e|e.to_string())).await.map_err(|e|e.to_string())?
 }
+#[tauri::command]
+async fn open_support() -> Result<(),String> {
+ tauri::async_runtime::spawn_blocking(||open::that("https://www.buymeacoffee.com/tyromas").map_err(|e|e.to_string())).await.map_err(|e|e.to_string())?
+}
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
  tauri::Builder::default().plugin(tauri_plugin_dialog::init()).manage(Library(Mutex::new(LibraryDocument::default()))).manage(ffmpeg_setup::InstallLock(Mutex::new(()))).manage(preview::PreviewJobs::default()).manage(analysis::AnalysisJobs::default())
  .setup(|app| { media::start(app.handle().clone())?; Ok(()) })
  .on_window_event(|window,event|{if window.label()=="main" && matches!(event,tauri::WindowEvent::CloseRequested{..}){preview::cancel(window.app_handle());analysis::cancel(window.app_handle());}})
- .invoke_handler(tauri::generate_handler![load_library,save_library,open_repository,transfers::backup_library,transfers::restore_library,inspect_videos,analysis::detect_chapters,analysis::cancel_analysis,media::media_url,ffmpeg_setup::ffmpeg_status,ffmpeg_setup::install_ffmpeg,preview::media_source,preview::prepare_video,preview::cancel_preview])
+ .invoke_handler(tauri::generate_handler![load_library,save_library,open_repository,open_support,transfers::backup_library,transfers::restore_library,inspect_videos,analysis::detect_chapters,analysis::cancel_analysis,media::media_url,ffmpeg_setup::ffmpeg_status,ffmpeg_setup::install_ffmpeg,preview::media_source,preview::prepare_video,preview::cancel_preview])
  .run(tauri::generate_context!()).expect("error running VidChapterBuddy");
 }
 
@@ -192,7 +196,7 @@ mod tests {
   let resolved = Resolved::resolve(&manifests, capabilities, Target::current()).unwrap();
   assert!(resolved.has_app_acl);
   let authority = tauri::runtime_authority!(manifests, resolved);
-  for command in ["plugin:dialog|message", "load_library", "save_library", "backup_library", "restore_library", "open_repository", "inspect_videos", "detect_chapters", "cancel_analysis", "ffmpeg_status", "install_ffmpeg", "media_source", "prepare_video", "cancel_preview"] {
+  for command in ["plugin:dialog|message", "load_library", "save_library", "backup_library", "restore_library", "open_repository", "open_support", "inspect_videos", "detect_chapters", "cancel_analysis", "ffmpeg_status", "install_ffmpeg", "media_source", "prepare_video", "cancel_preview"] {
    assert!(authority.resolve_access(command, "main", "main", &Origin::Local).is_some(), "main must retain {command}");
    assert!(authority.resolve_access(command, "projection", "projection", &Origin::Local).is_none(), "projection must deny {command}");
   }

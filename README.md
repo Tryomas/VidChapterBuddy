@@ -2,6 +2,8 @@
 
 A desktop video library with friendly names, searchable chapters, and fullscreen projection. Built with Tauri 2 for Linux, Windows, and macOS.
 
+[☕ Buy me a coffee](https://www.buymeacoffee.com/tyromas)
+
 ![VidChapterBuddy playing Big Buck Bunny with example chapter markers](docs/screenshots/now-playing.png)
 
 *Demo library with manual example chapters. Film image: © 2008 Blender Foundation / [www.bigbuckbunny.org](https://www.bigbuckbunny.org/), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). [Film attribution details](https://peach.blender.org/about/).*

@@ -27,6 +27,7 @@
     "allow-backup-library",
     "allow-restore-library",
     "allow-open-repository",
-    "dialog:allow-message"
+    "dialog:allow-message",
+    "allow-open-support"
   ]
 }
