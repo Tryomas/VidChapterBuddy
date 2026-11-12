@@ -1,14 +1,46 @@
-name: Build installers
+name: Build and publish release
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
 
+# Serialize retries for one commit without canceling builds for other main commits.
+concurrency:
+  group: release-${{ github.sha }}
+  cancel-in-progress: false
+
 jobs:
+  version:
+    name: Determine release version
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      published: ${{ steps.release.outputs.published }}
+    steps:
+      - name: Check out the triggering commit and its history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Verify privacy, version, and release state
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/github-release.mjs --prepare
+
   build:
     name: ${{ matrix.name }}
+    needs: version
+    if: needs.version.outputs.published != 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
@@ -34,6 +66,8 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -61,21 +95,89 @@ jobs:
           workspaces: './src-tauri -> target'
           shared-key: ${{ matrix.target }}
           cache-on-failure: true
+      - name: Stamp the release version in every application manifest
+        run: node scripts/release-version.mjs --write
       - name: Install frontend dependencies
         run: npm ci
       - name: Check frontend and library logic
         run: npm test
-      - name: Build desktop installers
+      - name: Check Rust storage, permissions, and playback helpers
+        run: cargo test --manifest-path src-tauri/Cargo.toml --lib --locked
+      - name: Clear cached installers for this target
+        env:
+          BUILD_TARGET: ${{ matrix.target }}
+        run: node --input-type=module -e "import {rmSync} from 'node:fs'; import {join} from 'node:path'; rmSync(join('src-tauri','target',process.env.BUILD_TARGET,'release','bundle'), {recursive:true,force:true});"
+      - name: Build Windows and macOS installers
+        if: runner.os != 'Linux'
         run: npm run tauri build -- --target ${{ matrix.target }} --bundles ${{ matrix.bundles }}
+      - name: Fetch verified Linux AppRun
+        if: runner.os == 'Linux'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tool_dir="${XDG_CACHE_HOME:-$HOME/.cache}/tauri"
+          mkdir -p "$tool_dir"
+          curl --fail --location --silent --show-error --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/octet-stream" \
+            https://api.github.com/repos/tauri-apps/binary-releases/releases/assets/274691722 \
+            -o "$tool_dir/AppRun-x86_64"
+          echo "f30140a43a0a59e46db21bdefdf749b9e9f2c6946e92afabbacf98b8ae73fb4f  $tool_dir/AppRun-x86_64" | sha256sum --check
+          chmod +x "$tool_dir/AppRun-x86_64"
+      - name: Build Linux DEB and RPM installers
+        if: runner.os == 'Linux'
+        run: npm run tauri -- build --target x86_64-unknown-linux-gnu --bundles deb,rpm --verbose
+      - name: Bundle Linux AppImage with retries
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if npm run tauri -- bundle --target x86_64-unknown-linux-gnu --bundles appimage --verbose; then
+              exit 0
+            fi
+            echo "AppImage packaging attempt $attempt failed."
+            sleep 5
+          done
+          exit 1
       - name: Upload private build artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: ${{ matrix.artifact }}
+          name: ${{ matrix.artifact }}-${{ needs.version.outputs.version }}
           if-no-files-found: error
           retention-days: 14
           path: |
-            src-tauri/target/**/release/bundle/appimage/*.AppImage
-            src-tauri/target/**/release/bundle/deb/*.deb
-            src-tauri/target/**/release/bundle/rpm/*.rpm
-            src-tauri/target/**/release/bundle/nsis/*-setup.exe
-            src-tauri/target/**/release/bundle/dmg/*.dmg
+            src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
+            src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
+            src-tauri/target/${{ matrix.target }}/release/bundle/rpm/*.rpm
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe
+            src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+
+  release:
+    name: Publish complete private release
+    needs: [version, build]
+    if: needs.version.outputs.published != 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Check out the exact release commit and history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Download installers from this workflow run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: VidChapterBuddy-*-${{ needs.version.outputs.version }}
+          path: downloaded-installers
+      - name: Validate installers, generate checksums, and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/github-release.mjs

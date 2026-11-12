@@ -41,3 +41,7 @@ src-tauri/gen/schemas/
 *.db-journal
 *.db-wal
 *.db-shm
+
+# Local release packaging output
+downloaded-installers/
+release-assets/
