@@ -1,0 +1,38 @@
+{
+  "windows-x86_64": {
+    "url": "https://files.pythonhosted.org/packages/82/0c/a1d49f3dd2688bd750b4986f8e271ad11f8e729a896070ea25f587b44da8/imageio_ffmpeg-0.8.1-py3-none-win_amd64.whl",
+    "archiveSha256": "f27ca4cb85e2d4946deedbce1a81245dfd942a2bcf94b53676fb3956aa95bf1b",
+    "binarySha256": "3256173f3f8bffd7df12227c68adf68025edb1832273a9530688a7bb1ed8edec",
+    "member": "imageio_ffmpeg/binaries/ffmpeg-win-x86_64-v9.0.2.exe",
+    "downloadBytes": 38893483,
+    "version": "9.0.2",
+    "upstreamUrl": "https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip"
+  },
+  "linux-x86_64": {
+    "url": "https://files.pythonhosted.org/packages/de/0f/49292fbef69ee10ebcf97bb741602521caafcc6966d5fa1a2b868cc15655/imageio_ffmpeg-0.8.1-py3-none-manylinux_2_28_x86_64.whl",
+    "archiveSha256": "050d6850601c3b3890bd2b28306f3b842b3daea390a561101174375a1c460bda",
+    "binarySha256": "0d709a0bed1a43f24cd2c420878c63afea4580671b6949ad19ed124572f3bc3d",
+    "member": "imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v9.0.2",
+    "downloadBytes": 67998402,
+    "version": "9.0.2",
+    "upstreamUrl": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-30-13-08/ffmpeg-n9.0.2-17-g2a571b6068-linux64-gpl-9.0.tar.xz"
+  },
+  "macos-x86_64": {
+    "url": "https://files.pythonhosted.org/packages/da/24/2c3a7c69453bfb8374ddbbb5007346bad4a4247bc86882f3521cd615f929/imageio_ffmpeg-0.8.1-py3-none-macosx_10_13_x86_64.whl",
+    "archiveSha256": "9538a10e598257263b5de1a1c1b86e7603417bc219245b1e279b452e5e48cc20",
+    "binarySha256": "a45b462cf91ed89148ae218c4577e30896485d7a6792c3673bcf5f823fa01b63",
+    "member": "imageio_ffmpeg/binaries/ffmpeg-macos-x86_64-v9.0.2",
+    "downloadBytes": 26974382,
+    "version": "9.0.2",
+    "upstreamUrl": "https://evermeet.cx/ffmpeg/ffmpeg-9.0.2.zip"
+  },
+  "macos-aarch64": {
+    "url": "https://files.pythonhosted.org/packages/2b/47/9f9b654f853598bae0850fa22bba168103e45d31b5a2a893ed474f28d54a/imageio_ffmpeg-0.8.1-py3-none-macosx_12_0_arm64.whl",
+    "archiveSha256": "5636d691e36e5274b13fe38182b1f627b2e35dcecc63944012c2470f9484fc45",
+    "binarySha256": "591260c945d0eef150e3bf82b0ef988bd36a9cecc18ff05d6679617159f0a95e",
+    "member": "imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v9.0",
+    "downloadBytes": 22625474,
+    "version": "9.0",
+    "upstreamUrl": "https://www.osxexperts.net/ffmpeg9arm.zip"
+  }
+}

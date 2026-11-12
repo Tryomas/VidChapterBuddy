@@ -1,0 +1,32 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-set-fullscreen-on-monitor",
+    "core:window:allow-show",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "allow-load-library",
+    "allow-save-library",
+    "allow-inspect-videos",
+    "allow-detect-chapters",
+    "allow-cancel-analysis",
+    "allow-media-url",
+    "allow-ffmpeg-status",
+    "allow-install-ffmpeg",
+    "allow-media-source",
+    "allow-prepare-video",
+    "allow-cancel-preview",
+    "allow-backup-library",
+    "allow-restore-library",
+    "allow-open-repository",
+    "dialog:allow-message"
+  ]
+}
