@@ -132,7 +132,9 @@ pub fn backup(dir: &Path, destination: &Path) -> Result<(), String> {
             }
         }
     }
-    fs::File::open(&temp.0).map_err(error)?.sync_all().map_err(error)?;
+    // Windows FlushFileBuffers (used by sync_all) requires write access.
+    // Do not truncate: the SQLite snapshot is already complete at this point.
+    fs::OpenOptions::new().write(true).open(&temp.0).map_err(error)?.sync_all().map_err(error)?;
     fs::rename(&temp.0,destination).map_err(error)
 }
 pub fn read_backup(source: &Path) -> Result<LibraryDocument, String> {
