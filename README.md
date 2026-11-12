@@ -2,7 +2,7 @@
 
 A desktop video library with friendly names, searchable chapters, and fullscreen projection. Built with Tauri 2 for Linux, Windows, and macOS.
 
-[☕ Buy me a coffee](https://www.buymeacoffee.com/tyromas)
+[☕ Buy me a coffee](https://www.buymeacoffee.com/tryomas)
 
 ![VidChapterBuddy playing Big Buck Bunny with example chapter markers](docs/screenshots/now-playing.png)
 

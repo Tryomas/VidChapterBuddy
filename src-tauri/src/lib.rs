@@ -138,7 +138,7 @@ async fn open_repository() -> Result<(),String> {
 }
 #[tauri::command]
 async fn open_support() -> Result<(),String> {
- tauri::async_runtime::spawn_blocking(||open::that("https://www.buymeacoffee.com/tyromas").map_err(|e|e.to_string())).await.map_err(|e|e.to_string())?
+ tauri::async_runtime::spawn_blocking(||open::that("https://www.buymeacoffee.com/tryomas").map_err(|e|e.to_string())).await.map_err(|e|e.to_string())?
 }
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
