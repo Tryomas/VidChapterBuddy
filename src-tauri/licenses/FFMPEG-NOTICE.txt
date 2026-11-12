@@ -1,0 +1,9 @@
+Optional FFmpeg download
+
+VidChapterBuddy can download FFmpeg from the imageio-ffmpeg 0.8.1 distributions on PyPI. No Python installation is required. Only the FFmpeg executable and license notices are installed into VidChapterBuddy's application data directory.
+
+FFmpeg: https://ffmpeg.org/
+Package and binary provenance: https://github.com/imageio/imageio-ffmpeg
+Pinned package: https://pypi.org/project/imageio-ffmpeg/0.8.1/
+Build sources and checksums: https://github.com/imageio/imageio-ffmpeg/blob/main/tools/ffmpeg-sources.json
+Upstream recipes/source links are recorded in download-info.json beside the installed executable. These third-party FFmpeg builds use GPL-licensed components; license texts accompany the downloaded tool.

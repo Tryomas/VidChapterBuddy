@@ -1,0 +1,95 @@
+name: Build Linux installers
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact: VidChapterBuddy-Linux-x64
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils file gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav
+      - name: Set up Rust
+        shell: bash
+        run: |
+          rustup update stable
+          rustup default stable
+          if [ "${{ matrix.target }}" = "universal-apple-darwin" ]; then
+            rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          else
+            rustup target add "${{ matrix.target }}"
+          fi
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: './src-tauri -> target'
+          shared-key: ${{ matrix.target }}
+          cache-on-failure: true
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Check frontend and library logic
+        run: npm test
+      - name: Fetch verified AppRun through GitHub asset API
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tool_dir="${XDG_CACHE_HOME:-$HOME/.cache}/tauri"
+          mkdir -p "$tool_dir"
+          curl --fail --location --silent --show-error --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/octet-stream" \
+            https://api.github.com/repos/tauri-apps/binary-releases/releases/assets/274691722 \
+            -o "$tool_dir/AppRun-x86_64"
+          echo "f30140a43a0a59e46db21bdefdf749b9e9f2c6946e92afabbacf98b8ae73fb4f  $tool_dir/AppRun-x86_64" | sha256sum --check
+          chmod +x "$tool_dir/AppRun-x86_64"
+      - name: Build DEB and RPM packages
+        run: npm run tauri -- build --target x86_64-unknown-linux-gnu --bundles deb,rpm --verbose
+      - name: Bundle AppImage with retry and diagnostic output
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if npm run tauri -- bundle --target x86_64-unknown-linux-gnu --bundles appimage --verbose; then
+              exit 0
+            fi
+            echo "AppImage packaging attempt $attempt failed; retrying downloaded packaging tools."
+            sleep 5
+          done
+          exit 1
+      - name: Upload private build artifacts
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ matrix.artifact }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            src-tauri/target/**/release/bundle/appimage/*.AppImage
+            src-tauri/target/**/release/bundle/deb/*.deb
+            src-tauri/target/**/release/bundle/rpm/*.rpm
+            src-tauri/target/**/release/bundle/nsis/*-setup.exe
+            src-tauri/target/**/release/bundle/dmg/*.dmg

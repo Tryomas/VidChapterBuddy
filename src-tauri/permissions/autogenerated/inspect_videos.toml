@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-inspect-videos"
+description = "Enables the inspect_videos command without any pre-configured scope."
+commands.allow = ["inspect_videos"]
+
+[[permission]]
+identifier = "deny-inspect-videos"
+description = "Denies the inspect_videos command without any pre-configured scope."
+commands.deny = ["inspect_videos"]

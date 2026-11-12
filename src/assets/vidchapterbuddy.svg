@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>VidChapterBuddy</title>
+  <desc>A mint video player with a golden chapter bookmark on a midnight rounded square.</desc>
+  <defs>
+    <linearGradient id="tile" x1="56" y1="32" x2="440" y2="492" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#253E43"/>
+      <stop offset="1" stop-color="#101B29"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="104" y1="148" x2="380" y2="388" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C5FFE1"/>
+      <stop offset="1" stop-color="#65D7BC"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="322" y1="88" x2="386" y2="224" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE3A1"/>
+      <stop offset="1" stop-color="#F5B65B"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#tile)"/>
+  <rect x="17" y="17" width="478" height="478" rx="111" stroke="#FFFFFF" stroke-opacity=".09" stroke-width="2"/>
+  <rect x="84" y="136" width="344" height="260" rx="44" fill="#101E2B" stroke="url(#mint)" stroke-width="24"/>
+  <path d="M208 208C208 200 216 196 223 200L303 249C310 253 310 263 303 267L223 316C216 320 208 316 208 308V208Z" fill="url(#mint)"/>
+  <path d="M116 352H172" stroke="#75DEC1" stroke-width="12" stroke-linecap="round"/>
+  <path d="M196 352H252" stroke="#75DEC1" stroke-opacity=".65" stroke-width="12" stroke-linecap="round"/>
+  <path d="M276 352H396" stroke="#75DEC1" stroke-opacity=".3" stroke-width="12" stroke-linecap="round"/>
+  <path d="M318 100C318 93 323 88 330 88H378C385 88 390 93 390 100V222L354 199L318 222V100Z" fill="#101E2B" stroke="#101E2B" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M318 100C318 93 323 88 330 88H378C385 88 390 93 390 100V222L354 199L318 222V100Z" fill="url(#gold)"/>
+  <path d="M337 111H371" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="5" stroke-linecap="round"/>
+</svg>

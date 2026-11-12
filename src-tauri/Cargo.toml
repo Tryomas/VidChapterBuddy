@@ -1,0 +1,54 @@
+[package]
+name = "vidchapterbuddy"
+version = "0.1.2"
+description = "Video library, chapters, and projection"
+license = "MIT"
+authors = ["Tryomas"]
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "vidchapterbuddy_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+rusqlite = { version = "0.42", features = ["bundled", "backup", "limits", "hooks"] }
+tauri = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-dialog = "2"
+open = { version = "5", features = ["shellexecute-on-windows"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
+sha2 = "0.10"
+zip = { version = "9.0.5", default-features = false, features = ["deflate"] }
+axum = { version = "0.8", default-features = false, features = ["tokio", "http1"] }
+tokio = { version = "1", features = ["net", "macros", "rt", "sync"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.7", features = ["fs"] }
+uuid = { version = "1", features = ["v4"] }
+
+
+# Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true
+
+[patch.crates-io]
+glib = { path = "vendor/glib" }
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+glib = "0.18.5"
+
+# Exercise the GLib security backport under the optimizations that exposed the bug.
+[profile.test.package.glib]
+opt-level = 3
