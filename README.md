@@ -6,6 +6,10 @@ A desktop video library with friendly names, searchable chapters, and fullscreen
 
 *Demo library with manual example chapters. Film image: © 2008 Blender Foundation / [www.bigbuckbunny.org](https://www.bigbuckbunny.org/), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). [Film attribution details](https://peach.blender.org/about/).*
 
+## Downloads
+
+Get packaged installers from [GitHub Releases](https://github.com/Tryomas/VidChapterBuddy/releases): Linux AppImage/DEB/RPM, Windows setup EXE, and macOS universal DMG. Installers appear after all platform builds succeed; each release includes SHA-256 checksums. Repository access is required while the project is private.
+
 ## Run
 
 Install Node.js 24, npm, current stable Rust with Cargo, and the [Tauri prerequisites for your operating system](https://v2.tauri.app/start/prerequisites/). Windows requires the MSVC build tools and WebView2, macOS requires Xcode command line tools, and Linux requires WebKitGTK and GStreamer. SQLite is compiled into the app. Chapter suggestions and compatibility previews can use an existing FFmpeg installation or an optional download offered on first use.
