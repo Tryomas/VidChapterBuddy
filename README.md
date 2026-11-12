@@ -80,6 +80,14 @@ SQLite is bundled with the app; no separate database installation is required. T
 
 VidChapterBuddy is [MIT licensed](LICENSE). Third-party dependencies and the optional FFmpeg download retain their own licenses and notices. Source repository: [Tryomas/VidChapterBuddy](https://github.com/Tryomas/VidChapterBuddy) (private; requires access). The app footer opens this fixed URL in your default browser.
 
-See [DISTRIBUTION.md](DISTRIBUTION.md) for private, manually triggered installer builds. Pushing source does not start these workflows.
+Pushes to `main` build installers and publish a private GitHub Release. Branch pushes and PRs do not build releases; merging a PR into `main` does. See [DISTRIBUTION.md](DISTRIBUTION.md) for versioning, release downloads, and retry behavior.
 
 The editable icon is `src/assets/vidchapterbuddy.svg`. Generate desktop icons with `npm run tauri -- icon src/assets/vidchapterbuddy.svg --output src-tauri/icons`.
+
+## Release versions
+
+The root [version.txt](version.txt) contains the major/minor base, currently `1.0`. The commit establishing that base is `1.0.0`; each subsequent first-parent commit on `main` increments the patch (`1.0.1`, `1.0.2`, …). A PR merge counts once, regardless of its internal branch commits. Multiple commits pushed together advance the counter by that many mainline commits. Rerunning the same SHA retains the same version.
+
+CI stamps the calculated version into the npm, Cargo, lockfile, and Tauri manifests without creating version-bump commits. The checked-in manifests use the development base (`1.0.0`). Raise `version.txt` to a higher base, such as `1.1`, to start a new series at `1.1.0`; do not reuse an earlier base.
+
+`node scripts/release-version.mjs` previews the version for the current commit. Add `--write` to stamp the local manifests before a manual build. The initial workflow setup commit uses `[skip ci]`; merging the follow-up PR triggers the first `1.0.1` release.

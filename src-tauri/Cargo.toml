@@ -1,6 +1,6 @@
 [package]
 name = "vidchapterbuddy"
-version = "0.1.2"
+version = "1.0.0"
 description = "Video library, chapters, and projection"
 license = "MIT"
 authors = ["Tryomas"]

@@ -1,6 +1,6 @@
 # Local security review and fixes
 
-Last reviewed and tested on Linux on 2026-11-11. Installer workflows are manual-only. Uploading source does not start cloud builds.
+Last reviewed and tested on Linux on 2026-11-11. The main release workflow runs on pushes to `main`; branch pushes and PRs do not publish releases. The standalone Linux repair workflow remains manual.
 
 ## Dependency findings
 
@@ -24,11 +24,11 @@ All custom commands are enrolled in Tauri's application ACL. The main window has
 
 ## Verification
 
-- Frontend TypeScript/Vite build and all 11 existing frontend logic tests passed.
+- Frontend TypeScript/Vite build and all 20 JavaScript/TypeScript logic and release-automation tests passed.
 - All 24 Rust tests passed, including SQLite migration, round trips, backup portability, restore safety snapshots, transactional rollback, invalid backup rejection, the real FFmpeg WMV-to-MP4 smoke test, process timeout/output/cancellation, cache eviction, media range/authentication, and resolved window permissions.
 - The GLib regression exercises next, next_back, nth, nth_back, last, and collection with GLib compiled at optimization level 3, where the original undefined behavior was exposed.
 - Browser smoke checks passed for analysis cancellation and retry, existing-FFmpeg reuse, optional download consent/skip/retry, local playback/blanking, projection blanking, SQLite-backed autoplay, backup/restore controls, and video removal confirmation/cancellation. These browser tests use a fake library and do not edit the user's saved library.
-- Latest local Linux app rebuilt and restarted. Windows and macOS runtime behavior has not been retested here; cloud builds remain deferred until requested.
+- Latest local Linux app rebuilt and restarted. Windows and macOS runtime behavior has not been retested here; release runtime testing still requires those target systems.
 
 Sources: https://rustsec.org/advisories/RUSTSEC-2024-0429.html and https://github.com/gtk-rs/gtk-rs-core/pull/1343 ; https://github.com/zip-rs/zip2/security/advisories ; https://tauri.app/security/capabilities/
 
@@ -39,3 +39,7 @@ SQLite is bundled through rusqlite. Data writes are parameterized and transactio
 Autoplay is now part of the database and backups. JSON source files are preserved during migration. Backups exclude source videos, FFmpeg binaries, and preview caches.
 
 The GitHub link uses the same small cross-platform `open` library used by Tauri's opener plugin, but does not include unused file-manager/D-Bus integration or grant arbitrary URL/path opening to frontend code. The screenshot uses a separate demo library and real video playback; it does not expose the user library.
+
+## Automated release controls
+
+Release versions derive from a validated major/minor file and first-parent Git history; build inputs are pinned to the triggering SHA. Read-only jobs verify repository privacy and detect previously published versions. Only the final publication job receives contents-write access, and it verifies privacy again. All five installers and their checksums must be uploaded to a draft before publication. Conflicting tags/drafts fail rather than being overwritten; already-published assets are never replaced on reruns. Actions are pinned to commit SHAs and checkout does not persist credentials. Release automation tests cover version increments, merges, base changes, consistent manifest stamping, missing installers, public repositories, conflicting tags, upload failures, and idempotent publication.
