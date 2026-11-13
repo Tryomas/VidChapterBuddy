@@ -1,4 +1,4 @@
-# Private releases and installers
+# Releases and installers
 
 The [Build and publish release](https://github.com/Tryomas/VidChapterBuddy/actions/workflows/build-installers.yml) workflow runs only for pushes to `main`. PRs and other branch pushes do not build releases. A merged PR creates a push to `main` and starts the workflow. GitHub's `[skip ci]` commit-message marker skips a push build; the initial setup commit uses it so the follow-up PR merge starts the first release.
 
@@ -16,9 +16,9 @@ The workflow builds Linux x64 (AppImage, DEB, RPM), Windows x64 (NSIS setup EXE)
 
 After all platform jobs succeed, the publishing job downloads artifacts from that exact workflow run, requires all five matching-version installers, and generates `SHA256SUMS.txt`. It creates a draft release tagged `v<version>` at the triggering commit, uploads every installer and the checksums, and only then publishes it with generated release notes. If a platform build fails, no release is published. An interrupted upload leaves a draft that can be resumed on a rerun.
 
-Both version preparation and publication verify that the repository is private. Releases and installers remain accessible only to people with repository access. Only the publishing job has `contents: write`; build jobs have read access. A conflicting existing tag or draft is rejected. A published release is never overwritten: rerunning that commit skips its builds when the matching published release already exists. Concurrent runs for different commits are allowed; GitHub's semantic-version-based latest selection prevents a slower older release from becoming the latest.
+Release publishing supports public and private repositories. This repository is public, so published releases and installers are publicly downloadable. Only the publishing job has `contents: write`; build jobs have read access. A conflicting existing tag or draft is rejected. A published release is never overwritten: rerunning that commit skips its builds when the matching published release already exists. Concurrent runs for different commits are allowed; GitHub's semantic-version-based latest selection prevents a slower older release from becoming the latest.
 
-Download installers from [Releases](https://github.com/Tryomas/VidChapterBuddy/releases). Workflow artifacts are also retained privately for 14 days. Release assets remain available until explicitly deleted and are independent of workflow-artifact expiration. Builds use the account's available GitHub Actions minutes.
+Download installers from [Releases](https://github.com/Tryomas/VidChapterBuddy/releases). Workflow artifacts are also retained for 14 days and are accessible to signed-in GitHub users with repository read access. Release assets remain available until explicitly deleted and are independent of workflow-artifact expiration. Builds use the account's available GitHub Actions minutes.
 
 The standalone **Build Linux installers** workflow remains a manual diagnostic/repair build. It does not create a release or automatically run on pushes. Its artifacts use the checked-in development version unless that source revision was explicitly stamped. Use the main release workflow for official versioned installers.
 

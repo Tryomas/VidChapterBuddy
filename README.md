@@ -10,7 +10,7 @@ A desktop video library with friendly names, searchable chapters, and fullscreen
 
 ## Downloads
 
-Get packaged installers from [GitHub Releases](https://github.com/Tryomas/VidChapterBuddy/releases): Linux AppImage/DEB/RPM, Windows setup EXE, and macOS universal DMG. Installers appear after all platform builds succeed; each release includes SHA-256 checksums. Repository access is required while the project is private.
+Get packaged installers from [GitHub Releases](https://github.com/Tryomas/VidChapterBuddy/releases): Linux AppImage/DEB/RPM, Windows setup EXE, and macOS universal DMG. Installers appear after all platform builds succeed; each release includes SHA-256 checksums. Installers are publicly downloadable.
 
 ## Run
 
@@ -84,9 +84,9 @@ SQLite is bundled with the app; no separate database installation is required. T
 
 ## License and source
 
-VidChapterBuddy is [MIT licensed](LICENSE). Third-party dependencies and the optional FFmpeg download retain their own licenses and notices. Source repository: [Tryomas/VidChapterBuddy](https://github.com/Tryomas/VidChapterBuddy) (private; requires access). The app footer opens this fixed URL in your default browser.
+VidChapterBuddy is [MIT licensed](LICENSE). Third-party dependencies and the optional FFmpeg download retain their own licenses and notices. Source repository: [Tryomas/VidChapterBuddy](https://github.com/Tryomas/VidChapterBuddy) (public). The app footer opens this fixed URL in your default browser.
 
-Pushes to `main` build installers and publish a private GitHub Release. Branch pushes and PRs do not build releases; merging a PR into `main` does. See [DISTRIBUTION.md](DISTRIBUTION.md) for versioning, release downloads, and retry behavior.
+Pushes to `main` build installers and publish a public GitHub Release. Branch pushes and PRs do not build releases; merging a PR into `main` does. See [DISTRIBUTION.md](DISTRIBUTION.md) for versioning, release downloads, and retry behavior.
 
 The editable icon is `src/assets/vidchapterbuddy.svg`. Generate desktop icons with `npm run tauri -- icon src/assets/vidchapterbuddy.svg --output src-tauri/icons`.
 

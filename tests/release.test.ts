@@ -93,8 +93,9 @@ function fake(options: { private?: boolean; wrongTag?: boolean; published?: bool
   });
   return { client, calls, assets };
 }
-test('public repositories and conflicting tags fail before any upload', async () => {
-  for (const options of [{ private: false }, { wrongTag: true }]) {
+test('conflicting tags fail before any upload in public and private repositories', async () => {
+  for (const isPrivate of [false, true]) {
+    const options = { private: isPrivate, wrongTag: true };
     const { client, calls, assets } = fake(options);
     await assert.rejects(publish(client, '1.0.1', sha, assets, () => assert.fail('Must not upload')));
     assert.ok(calls.every(c => c.method === 'GET'));
@@ -107,13 +108,18 @@ test('failed uploads or missing assets leave the release unpublished', async () 
   assert.ok(!missing.calls.some(c => c.method === 'PATCH'));
 });
 test('complete drafts publish after upload and reruns never replace published assets', async () => {
-  for (const draft of [false, true]) {
-    const state = fake({ draft }); let uploaded = false;
-    const result = await publish(state.client, '1.0.1', sha, state.assets, (_tag: string, files: string[]) => { assert.equal(files.length, 6); uploaded = true; });
-    assert.equal(result.draft, false); assert.ok(uploaded);
-    assert.deepEqual(state.calls.find(c => c.method === 'PATCH')?.body, { draft: false, make_latest: 'legacy' });
-    assert.equal(state.calls.filter(c => c.method === 'POST').length, draft ? 0 : 1);
+  for (const isPrivate of [false, true]) {
+    for (const draft of [false, true]) {
+      const state = fake({ private: isPrivate, draft }); let uploaded = false;
+      const prepared = await state.client.inspect('1.0.1', sha);
+      assert.equal(prepared.published, false);
+      assert.equal(prepared.tag, 'v1.0.1');
+      const result = await publish(state.client, '1.0.1', sha, state.assets, (_tag: string, files: string[]) => { assert.equal(files.length, 6); uploaded = true; });
+      assert.equal(result.draft, false); assert.ok(uploaded);
+      assert.deepEqual(state.calls.find(c => c.method === 'PATCH')?.body, { draft: false, make_latest: 'legacy' });
+      assert.equal(state.calls.filter(c => c.method === 'POST').length, draft ? 0 : 1);
+    }
+    const done = fake({ private: isPrivate, published: true }); await publish(done.client, '1.0.1', sha, done.assets, () => assert.fail('Published binaries must remain unchanged'));
+    assert.ok(done.calls.every(c => c.method === 'GET'));
   }
-  const done = fake({ published: true }); await publish(done.client, '1.0.1', sha, done.assets, () => assert.fail('Published binaries must remain unchanged'));
-  assert.ok(done.calls.every(c => c.method === 'GET'));
 });

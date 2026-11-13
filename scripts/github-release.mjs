@@ -22,8 +22,8 @@ export class GitHub {
   }
   async inspect(version, sha) {
     if (!/^\d+\.\d+\.\d+$/.test(version) || !/^[a-f0-9]{40}$/.test(sha)) throw new Error('A committed release version and full commit SHA are required.');
-    const repository = await this.api();
-    if (repository.private !== true) throw new Error('Release publishing is restricted to a private repository.');
+    // Repository visibility controls release visibility; both public and private repositories are supported.
+    await this.api();
     const tag = `v${version}`;
     let reference = await this.api(`/git/ref/tags/${tag}`, { missing: true });
     let object = reference?.object;

@@ -1,5 +1,25 @@
 # Local security review and fixes
 
+## Public repository and pull request security (2026-11-12)
+
+Reviewed GitHub's public `Tryomas/VidChapterBuddy` repository at commit `9df9197b07be71cc0e6b3e69e15267f9e787a6d1`; local workflow blobs matched GitHub. Neither workflow runs on pull requests, comments, `pull_request_target`, or `workflow_run`. The release workflow runs only after a push to `main`; the Linux diagnostic workflow is manual. Opening a pull request does not execute its code in this repository. Merging code into `main` trusts that code, including its build scripts and dependencies, so review workflow and executable-code changes before merging or manually building a contributor's branch.
+
+Verified or enabled these live repository settings:
+
+- Secret scanning and secret push protection enabled; the alert API returned no findings at review time. Scanning can be asynchronous and does not recognize every possible secret.
+- Dependabot vulnerability alerts enabled; the alert API returned no findings immediately after enabling. Dependency indexing and advisory scans can take time. Automated dependency-update PRs remain disabled.
+- Default Actions token permissions are read-only; Actions cannot approve pull requests. Only the release publication job explicitly receives repository contents-write permission. No personal access token is referenced by either workflow.
+- All outside contributors require approval for fork pull request workflows, including repeat contributors. This setting is additional protection if ordinary PR workflows are added later; it does not make privileged triggers safe.
+- Actions must be pinned to full commit SHAs. Existing action references already meet this policy, and checkout disables persisted credentials.
+- `main` requires a pull request for non-admin changes and resolved conversations; force pushes and deletion are disabled. Required approving review count is zero so a solo maintainer can merge their own PRs. Administrators retain bypass permission. These settings do not require independent review or prevent the owner from bypassing them.
+- No repository Actions secrets, self-hosted runners, deploy keys, or webhooks were configured. The only listed collaborator was the owner's account, `tryonlinux`.
+
+A local pattern scan of all seven reachable commits and 230 distinct blobs found no recognized GitHub/AWS/Google/Slack credentials, private-key headers, suspicious credential assignments, or sensitive credential/database filenames. This was a limited pattern scan, not proof that all history or files contain no private information; unreachable/deleted remote objects, account-wide credentials, installed GitHub Apps, and account authentication settings were outside this review.
+
+The repository is already public. GitHub Actions artifacts in a public repository must be treated as publicly accessible to signed-in users; workflow step names do not change visibility. Release publishing now supports public and private repositories, so this public repository publishes publicly downloadable installers. Preparation and publication still reject conflicting tags/drafts, and published releases remain immutable on reruns.
+
+Do not add personal account tokens to build workflows, run untrusted PR code using privileged triggers, or execute contributor code locally with personal credentials available. See [GitHub's guidance on privileged pull request workflows](https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target).
+
 Last reviewed and tested on Linux on 2026-11-11. The main release workflow runs on pushes to `main`; branch pushes and PRs do not publish releases. The standalone Linux repair workflow remains manual.
 
 ## Dependency findings
@@ -42,4 +62,4 @@ The GitHub link uses the same small cross-platform `open` library used by Tauri'
 
 ## Automated release controls
 
-Release versions derive from a validated major/minor file and first-parent Git history; build inputs are pinned to the triggering SHA. Read-only jobs verify repository privacy and detect previously published versions. Only the final publication job receives contents-write access, and it verifies privacy again. All five installers and their checksums must be uploaded to a draft before publication. Conflicting tags/drafts fail rather than being overwritten; already-published assets are never replaced on reruns. Actions are pinned to commit SHAs and checkout does not persist credentials. Release automation tests cover version increments, merges, base changes, consistent manifest stamping, missing installers, public repositories, conflicting tags, upload failures, and idempotent publication.
+Release versions derive from a validated major/minor file and first-parent Git history; build inputs are pinned to the triggering SHA. Read-only jobs verify release state and detect previously published versions. Only the final publication job receives contents-write access. Public and private repositories are supported; releases follow repository visibility. All five installers and their checksums must be uploaded to a draft before publication. Conflicting tags/drafts fail rather than being overwritten; already-published assets are never replaced on reruns. Actions are pinned to commit SHAs and checkout does not persist credentials. Release automation tests cover version increments, merges, base changes, consistent manifest stamping, missing installers, public and private repositories, conflicting tags, upload failures, and idempotent publication.

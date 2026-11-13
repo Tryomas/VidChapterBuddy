@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
-      - name: Verify privacy, version, and release state
+      - name: Verify version and release state
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -139,7 +139,7 @@ jobs:
             sleep 5
           done
           exit 1
-      - name: Upload private build artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.artifact }}-${{ needs.version.outputs.version }}
@@ -153,7 +153,7 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
 
   release:
-    name: Publish complete private release
+    name: Publish complete release
     needs: [version, build]
     if: needs.version.outputs.published != 'true'
     runs-on: ubuntu-22.04
